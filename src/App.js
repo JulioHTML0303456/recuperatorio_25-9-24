@@ -1,10 +1,50 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function App() {
   const [category, setCategory] = useState("");
+  const [productos, setproductos] = useState([])
+  const [errorMessage, seterrorMessage] = useState("")
 
-  const handleCategoryChange = (event) => setCategory(event.target.value)
+
+
+
+  const setdata1 = () => {
+    axios.get('https://fakestoreapi.com/product')
+      .then((responce) => setproductos(responce.data))
+      .catch((error) => {
+        if(error != 200){
+          console.log(error)
+        }
+          
+      })
+  }
+  
+
+  /*const setdata2 = () => {
+    axios.get('https://fakestoreapi.com/products/categories')
+      .then((cat) => setCategory(cat))
+  }*/
+
+
+  useEffect(() => {
+    setdata1()
+    //setdata2()
+
+  }, []);
+
+  console.log(productos)
+
+
+
+  const handleCategoryChange = (event) => {
+    setCategory(event.target.value);
+  }
+
+  const filtrar = () => {
+    setproductos(productos.filter((producto) => producto.category === category))
+  }
 
   return (
     <main>
@@ -13,23 +53,34 @@ function App() {
 
       <div>
         <h2>Lista de todos los productos disponibles:</h2>
-        <p className="result-box"></p>
+
+        <p className="result-box">
+          <ul>
+            {productos.map((producto) => <li key={producto.id}>{producto.title}</li>)}
+          </ul>
+        </p>
       </div>
 
       <div>
         <h2>Obtener productos de una categoría determinada</h2>
 
         <h3>Ingrese una categoría:</h3>
+
         <input type="text" value={category} onChange={handleCategoryChange} />
-        <button>Enviar</button>
-        
+        <button type='onclick' onSubmit={filtrar}  >Enviar</button>
+
+
         <h3>Productos de la categoría ingresada:</h3>
-        <p className="result-box"></p>
+        <p className="result-box">
+          <ul>
+            {productos.map((producto) => <li key={producto.id}>{producto.title}</li>)}
+          </ul>
+        </p>
       </div>
 
       <div>
         <h2>Mensaje en caso de error:</h2>
-        <p className="result-box"></p>
+        <p className="result-box">{errorMessage}</p>
       </div>
 
       <div>
